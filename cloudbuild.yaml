@@ -1,7 +1,7 @@
 steps:
   - name: 'golang:1.19'
     entrypoint: 'go'
-    args: ['build', '-o', 'app' 'github.com/sinmetalcraft/metrics-scope-collector/cmd/server']
+    args: ['build', '-o', 'app', 'github.com/sinmetalcraft/metrics-scope-collector/cmd/server']
     env: []
   - name: 'gcr.io/kaniko-project/executor:v1.9.1'
     args:
