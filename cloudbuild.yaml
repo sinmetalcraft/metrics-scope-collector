@@ -1,0 +1,29 @@
+steps:
+  - name: 'golang:1.19'
+    entrypoint: 'go'
+    args: ['build', '-o', 'app' 'github.com/sinmetalcraft/metrics-scope-collector/cmd/server']
+    env: []
+  - name: 'gcr.io/kaniko-project/executor:v1.9.1'
+    args:
+      - --destination=asia-northeast1-docker.pkg.dev/$PROJECT_ID/metrics-scope-collector/main:$BRANCH_NAME
+      - --destination=asia-northeast1-docker.pkg.dev/$PROJECT_ID/metrics-scope-collector/main:$COMMIT_SHA
+      - --cache=true
+      - --cache-ttl=6h
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    entrypoint: 'gcloud'
+    args:
+      - beta
+      - run
+      - deploy
+      - metrics-scope-collector
+      - --region=asia-northeast1
+      - --platform=managed
+      - --service-account=metrics-scope-collector@$PROJECT_ID.iam.gserviceaccount.com
+      - --max-instances=1
+      - --cpu=1
+      - --memory=512Mi
+      - --concurrency=1
+      - --execution-environment=gen2
+      - --cpu-throttling
+      - --tag=$BRANCH_NAME
+      - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/metrics-scope-collector/main:$COMMIT_SHA
