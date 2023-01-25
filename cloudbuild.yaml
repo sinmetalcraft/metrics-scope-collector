@@ -26,4 +26,5 @@ steps:
       - --execution-environment=gen2
       - --cpu-throttling
       - --tag=$BRANCH_NAME
+      - --set-env-vars "SCOPING_PROJECT_ID=336622473699"
       - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/metrics-scope-collector/main:$COMMIT_SHA
