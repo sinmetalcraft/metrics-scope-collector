@@ -44,9 +44,12 @@ func (h *MetricsScopesGathererHandler) CleanUpHandler(w http.ResponseWriter, r *
 	}
 
 	scopingProjectID := os.Getenv("SCOPING_PROJECT_ID")
-	if err := h.Service.CleanUp(ctx, scopingProjectID); err != nil {
+	count, err := h.Service.CleanUp(ctx, scopingProjectID)
+	if err != nil {
 		log.Printf("failed CleanUp.scopingProjectID=%s err=%s\n", scopingProjectID, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("finish CleanUpMonitoredProjects.count=%d,scopingProjectID=%s\n", count, scopingProjectID)
 }
