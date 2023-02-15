@@ -62,3 +62,18 @@ func (s *Service) ImportMonitoredProjects(ctx context.Context, scopingProject st
 	}
 	return createdCount, nil
 }
+
+// CleanUp is 指定したScopingProjectのMetrics Scopeをすべて削除して最初の状態に戻す
+func (s *Service) CleanUp(ctx context.Context, scopingProject string) error {
+	scope, err := s.MetricsScopesService.GetMetricsScope(ctx, scopingProject)
+	if err != nil {
+		return fmt.Errorf("failed MetricsScopesService.GetMetricsScope. scopingProject=%s : %w", scopingProject, err)
+	}
+
+	for _, v := range scope.GetMonitoredProjects() {
+		if err := s.MetricsScopesService.DeleteMonitoredProject(ctx, scopingProject, v.GetName()); err != nil {
+			return err
+		}
+	}
+	return nil
+}

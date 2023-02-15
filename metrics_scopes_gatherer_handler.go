@@ -9,17 +9,17 @@ import (
 	crmbox "github.com/sinmetalcraft/gcpbox/cloudresourcemanager/v3"
 )
 
-type MetricsScopesImporterHandler struct {
+type MetricsScopesGathererHandler struct {
 	Service *Service
 }
 
-func NewMetricsScopesImporterHandler(ctx context.Context, service *Service) (*MetricsScopesImporterHandler, error) {
-	return &MetricsScopesImporterHandler{
+func NewMetricsScopesImporterHandler(ctx context.Context, service *Service) (*MetricsScopesGathererHandler, error) {
+	return &MetricsScopesGathererHandler{
 		Service: service,
 	}, nil
 }
 
-func (h *MetricsScopesImporterHandler) Handler(w http.ResponseWriter, r *http.Request) {
+func (h *MetricsScopesGathererHandler) CreateHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	scopingProjectID := os.Getenv("SCOPING_PROJECT_ID")
@@ -33,4 +33,20 @@ func (h *MetricsScopesImporterHandler) Handler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	log.Printf("finish ImportMonitoredProjects.count=%d,scopingProjectID=%s,importResourceID=%s,importResourceType=%s.\n", count, scopingProjectID, importResourceID, importResourceType)
+}
+
+func (h *MetricsScopesGathererHandler) CleanUpHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	scopingProjectID := os.Getenv("SCOPING_PROJECT_ID")
+	if err := h.Service.CleanUp(ctx, scopingProjectID); err != nil {
+		log.Printf("failed CleanUp.scopingProjectID=%s err=%s\n", scopingProjectID, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

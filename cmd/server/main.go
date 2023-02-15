@@ -46,7 +46,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	http.HandleFunc("/metrics-scopes-import", metricsScopesImporterHandler.Handler)
+	http.HandleFunc("/metrics-scopes-gatherer/create", metricsScopesImporterHandler.CreateHandler)
+	http.HandleFunc("/metrics-scopes-gatherer/cleanup", metricsScopesImporterHandler.CleanUpHandler)
 
 	http.HandleFunc("/", handler)
 
