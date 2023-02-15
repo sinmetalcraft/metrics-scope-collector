@@ -9,6 +9,7 @@ import (
 
 	metricsscope "cloud.google.com/go/monitoring/metricsscope/apiv1"
 	crmbox "github.com/sinmetalcraft/gcpbox/cloudresourcemanager/v3"
+	metricsscopebox "github.com/sinmetalcraft/gcpbox/monitoring/metricsscope/v0"
 	msc "github.com/sinmetalcraft/metrics-scope-collector"
 	"google.golang.org/api/cloudresourcemanager/v3"
 )
@@ -22,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	metricsScopesService, err := msc.NewMetricsScopesService(ctx, client)
+	metricsScopesService, err := metricsscopebox.NewService(ctx, client)
 	if err != nil {
 		panic(err)
 	}
