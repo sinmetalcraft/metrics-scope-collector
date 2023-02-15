@@ -23,16 +23,28 @@ func (h *MetricsScopesGathererHandler) CreateHandler(w http.ResponseWriter, r *h
 	ctx := r.Context()
 
 	scopingProjectID := os.Getenv("SCOPING_PROJECT_ID")
-	importResourceID := r.FormValue("importResourceID")
-	importResourceType := r.FormValue("importResourceType")
+	parentResourceID := r.FormValue("parentResourceID")
+	parentResourceType := r.FormValue("parentResourceType")
 
-	count, err := h.Service.ImportMonitoredProjects(ctx, scopingProjectID, &crmbox.ResourceID{ID: importResourceID, Type: importResourceType})
-	if err != nil {
-		log.Printf("failed ImportMonitoredProjects.scopingProjectID=%s,importResourceID=%s,importResourceType=%s. err=%s\n", scopingProjectID, importResourceID, importResourceType, err)
+	if scopingProjectID == "" {
+		log.Println("required scoping project id")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Printf("finish ImportMonitoredProjects.count=%d,scopingProjectID=%s,importResourceID=%s,importResourceType=%s.\n", count, scopingProjectID, importResourceID, importResourceType)
+	if parentResourceID == "" || parentResourceType == "" {
+		log.Println("required parentResourceID and parentResourceType")
+		w.Write([]byte("required parentResourceID and parentResourceType"))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	count, err := h.Service.ImportMonitoredProjects(ctx, scopingProjectID, &crmbox.ResourceID{ID: parentResourceID, Type: parentResourceType})
+	if err != nil {
+		log.Printf("failed ImportMonitoredProjects.scopingProjectID=%s,parentResourceID=%s,parentResourceType=%s. err=%s\n", scopingProjectID, parentResourceID, parentResourceType, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Printf("finish ImportMonitoredProjects.count=%d,scopingProjectID=%s,parentResourceID=%s,parentResourceType=%s.\n", count, scopingProjectID, parentResourceID, parentResourceType)
 }
 
 func (h *MetricsScopesGathererHandler) CleanUpHandler(w http.ResponseWriter, r *http.Request) {
